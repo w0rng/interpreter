@@ -1,13 +1,13 @@
 package Abramov;
 
-class Token<Type> {
+public class Token<Type> {
 
     public enum TokenTypes {
         EOF, ERR, INT, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN
     }
 
-    TokenTypes type;
-    Type value;
+    public TokenTypes type;
+    public Type value;
 
     public Token(TokenTypes type, Type value) {
         this.type = type;
