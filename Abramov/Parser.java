@@ -1,7 +1,8 @@
 package Abramov;
 
 import java.util.Arrays;
-
+import Abramov.Tree.*;
+import Abramov.Tree.Number;
 import Abramov.Token.TokenTypes;
 
 class Parser {
@@ -29,13 +30,13 @@ class Parser {
         Token token = currentToken;
         if (token.type == TokenTypes.PLUS) {
             want(TokenTypes.PLUS);
-            return new Node(token, factor());
+            return new UnaryOperator(token, factor());
         } else if (token.type == TokenTypes.MINUS) {
             want(TokenTypes.MINUS);
-            return new Node(token, factor());
+            return new UnaryOperator(token, factor());
         } else if (token.type == TokenTypes.INT) {
             want(TokenTypes.INT);
-            return new Node(token);
+            return new Number(token);
         } else if (token.type == TokenTypes.LPAREN) {
             want(TokenTypes.LPAREN);
             Node node = expr();
@@ -55,7 +56,7 @@ class Parser {
                 want(TokenTypes.MUL);
             else if (token.type == TokenTypes.DIV)
                 want(TokenTypes.DIV);
-            node = new Node(node, token, factor());
+            node = new BinaryOperator(node, token, factor());
         }
         return node;
     }
@@ -68,7 +69,7 @@ class Parser {
                 want(TokenTypes.PLUS);
             else if (token.type == TokenTypes.MINUS)
                 want(TokenTypes.MINUS);
-            node = new Node(node, token, term());
+            node = new BinaryOperator(node, token, term());
         }
         return node;
     }

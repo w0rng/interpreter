@@ -1,23 +1,25 @@
 package Abramov;
 
+import Abramov.Tree.*;
+import Abramov.Tree.Number;
 import Abramov.Token.TokenTypes;
 
-class Interpreter {
+public class Interpreter {
     Parser parser;
 
     public Interpreter(Parser parser) {
         this.parser = parser;
     }
 
-    int visit_UnOp(Node node) {
-        if (node.token.type == TokenTypes.PLUS)
+    int visit_UnOp(UnaryOperator node) {
+        if (node.operator.type == TokenTypes.PLUS)
             return visit(node.right);
         else
             return -visit(node.right);
     }
 
-    int visit_BinOp(Node node) {
-        switch (node.token.type) {
+    int visit_BinOp(BinaryOperator node) {
+        switch (node.operator.type) {
         case PLUS:
             return visit(node.left) + visit(node.right);
         case MINUS:
@@ -29,15 +31,20 @@ class Interpreter {
         default:
             return 0;
         }
+
+    }
+
+    int visit_num(Number node) {
+        return node.value;
     }
 
     int visit(Node node) {
-        if (node.token.type == TokenTypes.INT)
-            return (int) node.token.value;
-        else if (node.left != null)
-            return visit_BinOp(node);
+        if (node instanceof Number)
+            return visit_num((Number) node);
+        else if (node instanceof BinaryOperator)
+            return visit_BinOp((BinaryOperator) node);
         else
-            return visit_UnOp(node);
+            return visit_UnOp((UnaryOperator) node);
     }
 
     int interpret() {
