@@ -1,20 +1,16 @@
 package Abramov;
 
-public class Token<Type> {
+public class Token {
 
-    public enum TokenTypes {
-        EOF, ERR, INT, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN
-    }
+    public TokenTypes.Types type;
+    public String value;
 
-    public TokenTypes type;
-    public Type value;
-
-    public Token(TokenTypes type, Type value) {
+    public Token(TokenTypes.Types type, String value) {
         this.type = type;
         this.value = value;
     }
 
-    public String str() {
-        return String.format("Token(%s:%s)", type.name(), value.toString());
+    public String toString() {
+        return "Token(" + type.name() + " : '" + value.toString() + "')";
     }
 }

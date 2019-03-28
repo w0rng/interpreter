@@ -1,9 +1,9 @@
 package Abramov;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+
+import Abramov.TokenTypes.Types;
 import Abramov.Tree.*;
-import Abramov.Tree.Number;
-import Abramov.Token.TokenTypes;
 
 class Parser {
     private Token currentToken;
@@ -19,43 +19,95 @@ class Parser {
         System.exit(-1);
     }
 
-    private void want(TokenTypes tokenType) {
+    private void want(TokenTypes.Types tokenType) {
         if (currentToken.type == tokenType)
             currentToken = lexer.getNextToken();
         else
             dropError();
     }
 
+    private Node program() {
+        Node node = compound_statement();
+        want(Types.EOF);
+        return node;
+    }
+
+    private Node compound_statement() {
+        want(Types.LBRACE);
+        Node[] nodes = statement_list();
+        want(Types.RBRACE);
+
+        Compound root = new Compound();
+        for (Node node : nodes) {
+            root.add(node);
+        }
+        return root;
+    }
+
+    private Node[] statement_list() {
+        ArrayList<Node> result = new ArrayList<Node>();
+        result.add(statement());
+        while (currentToken.type == Types.SEMI) {
+            want(Types.SEMI);
+            result.add(statement());
+        }
+
+        if (currentToken.type == Types.ID)
+            dropError();
+
+        return result.toArray(Node[]::new);
+
+    }
+
+    private Node statement() {
+        switch (currentToken.type) {
+        case LBRACE:
+            return compound_statement();
+        case ID:
+            return assignment_statement();
+        default:
+            return new Node();
+        }
+    }
+
+    private Node assignment_statement() {
+        Node left = variable();
+        Token token = currentToken;
+        want(Types.ASSIGN);
+        return new Assign(left, token, expr());
+    }
+
+    private Node variable() {
+        Var node = new Var(currentToken);
+        want(Types.ID);
+        return node;
+    }
+
     private Node factor() {
         Token token = currentToken;
-        if (token.type == TokenTypes.PLUS) {
-            want(TokenTypes.PLUS);
+        switch (token.type) {
+        case PLUS:
+        case MINUS:
+            want(token.type);
             return new UnaryOperator(token, factor());
-        } else if (token.type == TokenTypes.MINUS) {
-            want(TokenTypes.MINUS);
-            return new UnaryOperator(token, factor());
-        } else if (token.type == TokenTypes.INT) {
-            want(TokenTypes.INT);
-            return new Number(token);
-        } else if (token.type == TokenTypes.LPAREN) {
-            want(TokenTypes.LPAREN);
+        case INT:
+            want(token.type);
+            return new Num(token);
+        case LPAREN:
+            want(token.type);
             Node node = expr();
-            want(TokenTypes.RPAREN);
+            want(Types.RPAREN);
             return node;
-        } else {
-            dropError();
-            return null;
+        default:
+            return variable();
         }
     }
 
     private Node term() {
         Node node = factor();
-        while (currentToken.type == TokenTypes.DIV || currentToken.type == TokenTypes.MUL) {
+        while (currentToken.type == Types.DIV || currentToken.type == Types.MUL) {
             Token token = currentToken;
-            if (token.type == TokenTypes.MUL)
-                want(TokenTypes.MUL);
-            else if (token.type == TokenTypes.DIV)
-                want(TokenTypes.DIV);
+            want(token.type);
             node = new BinaryOperator(node, token, factor());
         }
         return node;
@@ -63,18 +115,18 @@ class Parser {
 
     private Node expr() {
         Node node = term();
-        while (currentToken.type == TokenTypes.PLUS || currentToken.type == TokenTypes.MINUS) {
+        while (currentToken.type == Types.PLUS || currentToken.type == Types.MINUS) {
             Token token = currentToken;
-            if (token.type == TokenTypes.PLUS)
-                want(TokenTypes.PLUS);
-            else if (token.type == TokenTypes.MINUS)
-                want(TokenTypes.MINUS);
+            want(token.type);
             node = new BinaryOperator(node, token, term());
         }
         return node;
     }
 
     Node parse() {
-        return expr();
+        Node node = program();
+        if (currentToken.type != Types.EOF)
+            dropError();
+        return node;
     }
 }

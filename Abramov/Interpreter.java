@@ -1,25 +1,36 @@
 package Abramov;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import Abramov.Tree.*;
-import Abramov.Tree.Number;
-import Abramov.Token.TokenTypes;
 
 public class Interpreter {
     Parser parser;
+    private static Map<String, Integer> Scope = new HashMap<String, Integer>();
 
     public Interpreter(Parser parser) {
         this.parser = parser;
     }
 
-    int visit_UnOp(UnaryOperator node) {
-        if (node.operator.type == TokenTypes.PLUS)
-            return visit(node.right);
-        else
-            return -visit(node.right);
+    private void dropError() {
+        System.err.println("Ошибка интерпретации");
+        System.exit(-1);
     }
 
-    int visit_BinOp(BinaryOperator node) {
-        switch (node.operator.type) {
+    int visitUnOp(UnaryOperator node) {
+        switch (node.token.type) {
+        case PLUS:
+            return visit(node.right);
+        case MINUS:
+            return -visit(node.right);
+        default:
+            return 0;
+        }
+    }
+
+    int visitBinOp(BinaryOperator node) {
+        switch (node.token.type) {
         case PLUS:
             return visit(node.left) + visit(node.right);
         case MINUS:
@@ -34,21 +45,57 @@ public class Interpreter {
 
     }
 
-    int visit_num(Number node) {
-        return node.value;
+    void visitCompound(Compound node) {
+        for (Node child : node.get()) {
+            visit(child);
+        }
+    }
+
+    void visitAssign(Assign node) {
+        String varName = node.left.token.value;
+        if (Scope.containsKey(varName))
+            Scope.remove(varName);
+        Scope.put(varName, visit(node.right));
+    }
+
+    int visitVar(Var node) {
+        String name = node.token.value;
+        if (!Scope.containsKey(name))
+            dropError();
+        int val = Scope.get(name);
+        return val;
+    }
+
+    int visitNum(Num node) {
+        return node.getValue();
     }
 
     int visit(Node node) {
-        if (node instanceof Number)
-            return visit_num((Number) node);
-        else if (node instanceof BinaryOperator)
-            return visit_BinOp((BinaryOperator) node);
-        else
-            return visit_UnOp((UnaryOperator) node);
+        switch (node.getClass().getSimpleName()) {
+        case "Assign":
+            visitAssign((Assign) node);
+            return 0;
+        case "BinaryOperator":
+            return visitBinOp((BinaryOperator) node);
+        case "Compound":
+            visitCompound((Compound) node);
+            return 0;
+        case "Num":
+            return visitNum((Num) node);
+        case "UnaryOperator":
+            visitUnOp((UnaryOperator) node);
+            return 0;
+        case "Var":
+            return visitVar((Var) node);
+        default:
+            return 0;
+        }
     }
 
     int interpret() {
         Node tree = parser.parse();
-        return visit(tree);
+        visit(tree);
+        System.out.println(Scope.toString());
+        return 0;
     }
 }

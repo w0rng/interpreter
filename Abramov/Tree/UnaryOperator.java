@@ -4,10 +4,9 @@ import Abramov.Token;
 
 public class UnaryOperator extends Node {
     public Node right;
-    public Token operator;
 
-    public UnaryOperator(Token operator, Node right) {
-        this.operator = operator;
+    public UnaryOperator(Token token, Node right) {
+        super(token);
         this.right = right;
     }
 }
