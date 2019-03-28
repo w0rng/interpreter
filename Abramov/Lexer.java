@@ -1,12 +1,13 @@
 package Abramov;
 
-import Abramov.Token.TokenTypes;
+import Abramov.TokenTypes.Types;
 
 class Lexer {
 
     String text;
     int pos;
     char currentChar;
+    TokenTypes tokenTypes = new TokenTypes();
 
     public Lexer(String text) {
         this.text = text.replaceAll("\\s", "");
@@ -15,51 +16,58 @@ class Lexer {
     }
 
     private void dropError() {
-        System.err.println("Неправильный символ");
+        System.err.println("Не верный символ в позиции " + (pos + 1));
+        System.exit(-1);
+    }
+
+    private char NextChar() {
+        pos++;
+        if (pos > text.length() - 1)
+            return '\0';
+        else
+            return text.charAt(pos);
     }
 
     private void getNextChar() {
-        pos++;
-        if (pos > text.length() - 1)
-            currentChar = '\u0000';
-        else
-            currentChar = text.charAt(pos);
+        currentChar = NextChar();
     }
 
-    private int integer() {
+    private String integer() {
         String result = "";
-        while (Character.isDigit(currentChar) && currentChar != '\u0000') {
+        while (Character.isDigit(currentChar) && currentChar != '\0') {
             result += currentChar;
             getNextChar();
         }
-        return Integer.valueOf(result);
+        return result;
+    }
+
+    private Token id() {
+        String result = "";
+        while (currentChar != '\0' && Character.isLetterOrDigit(currentChar)) {
+            result += currentChar;
+            getNextChar();
+        }
+        if (TokenTypes.contain(result))
+            return TokenTypes.get(result);
+        else
+            return new Token(Types.ID, result);
     }
 
     Token getNextToken() {
-        while (currentChar != '\u0000') {
-            if (Character.isDigit(currentChar)) {
-                return new Token<Integer>(TokenTypes.INT, integer());
-            } else if (currentChar == '+') {
+        while (currentChar != '\0') {
+            if (currentChar == ' ') {
+                continue;
+            } else if (Character.isLetter(currentChar)) {
+                return id();
+            } else if (Character.isDigit(currentChar)) {
+                return new Token(Types.INT, integer());
+            } else if (TokenTypes.contain(Character.toString(currentChar))) {
+                Token tmp = TokenTypes.get(Character.toString(currentChar));
                 getNextChar();
-                return new Token<String>(TokenTypes.PLUS, "+");
-            } else if (currentChar == '-') {
-                getNextChar();
-                return new Token<String>(TokenTypes.MINUS, "-");
-            } else if (currentChar == '*') {
-                getNextChar();
-                return new Token<String>(TokenTypes.MUL, "*");
-            } else if (currentChar == '/') {
-                getNextChar();
-                return new Token<String>(TokenTypes.DIV, "/");
-            } else if (currentChar == '(') {
-                getNextChar();
-                return new Token<String>(TokenTypes.LPAREN, "(");
-            } else if (currentChar == ')') {
-                getNextChar();
-                return new Token<String>(TokenTypes.RPAREN, ")");
-            }
-            dropError();
+                return tmp;
+            } else
+                dropError();
         }
-        return new Token<Integer>(TokenTypes.EOF, 0);
+        return new Token(Types.EOF, "\0");
     }
 }
