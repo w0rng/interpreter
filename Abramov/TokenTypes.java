@@ -8,7 +8,7 @@ public class TokenTypes {
     private static Map<String, Token> Tokens = new HashMap<String, Token>();
 
     public static enum Types {
-        EOF, INT, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, LBRACE, RBRACE, ID, ASSIGN, SEMI
+        EOF, INT, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, LBRACE, RBRACE, ID, ASSIGN, SEMI, CLASS
     }
 
     public TokenTypes() {
@@ -23,6 +23,7 @@ public class TokenTypes {
         Tokens.put("}", new Token(Types.RBRACE, "}"));
         Tokens.put("=", new Token(Types.ASSIGN, "="));
         Tokens.put(";", new Token(Types.SEMI, ";"));
+        Tokens.put("class", new Token(Types.CLASS, "class"));
     }
 
     public static Token get(String key) {

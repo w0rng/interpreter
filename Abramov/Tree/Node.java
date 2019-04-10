@@ -10,7 +10,10 @@ public class Node {
     }
 
     public Node() {
+    }
 
+    public String toString() {
+        return "Node(\n\t" + token + "\n)";
     }
 
 }
