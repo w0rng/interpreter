@@ -14,22 +14,26 @@ class Parser {
         currentToken = lexer.getNextToken();
     }
 
-    private void dropError() {
-        System.err.println("Неверный синтаксис");
+    private void dropError(String wanted, String received) {
+        System.err.println("Неверный синтаксис\n" + "Хотел " + wanted + ", получил " + received);
         System.exit(-1);
     }
 
     private void want(TokenTypes.Types tokenType) {
         if (currentToken.type == tokenType)
             currentToken = lexer.getNextToken();
-        else
-            dropError();
+        else {
+            dropError(tokenType.name(), currentToken.type.name());
+        }
     }
 
     private Node program() {
-        Node node = compound_statement();
+        Token token = currentToken;
+        want(Types.CLASS);
+        String funcName = variable().token.value;
+        ProgClass clss = new ProgClass(token, funcName, compound_statement());
         want(Types.EOF);
-        return node;
+        return clss;
     }
 
     private Node compound_statement() {
@@ -51,10 +55,6 @@ class Parser {
             want(Types.SEMI);
             result.add(statement());
         }
-
-        if (currentToken.type == Types.ID)
-            dropError();
-
         return result.toArray(Node[]::new);
 
     }
@@ -126,7 +126,7 @@ class Parser {
     Node parse() {
         Node node = program();
         if (currentToken.type != Types.EOF)
-            dropError();
+            dropError(Types.EOF.name(), currentToken.type.name());
         return node;
     }
 }

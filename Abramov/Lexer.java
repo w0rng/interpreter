@@ -10,7 +10,7 @@ class Lexer {
     TokenTypes tokenTypes = new TokenTypes();
 
     public Lexer(String text) {
-        this.text = text.replaceAll("\\s", "");
+        this.text = text;
         pos = 0;
         currentChar = text.charAt(pos);
     }
@@ -56,6 +56,7 @@ class Lexer {
     Token getNextToken() {
         while (currentChar != '\0') {
             if (currentChar == ' ') {
+                getNextChar();
                 continue;
             } else if (Character.isLetter(currentChar)) {
                 return id();

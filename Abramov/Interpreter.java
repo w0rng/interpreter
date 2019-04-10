@@ -9,6 +9,8 @@ public class Interpreter {
     Parser parser;
     private static Map<String, Integer> Scope = new HashMap<String, Integer>();
 
+    boolean start = true;
+
     public Interpreter(Parser parser) {
         this.parser = parser;
     }
@@ -70,8 +72,15 @@ public class Interpreter {
         return node.getValue();
     }
 
+    void visitProgClass(ProgClass func) {
+        visit(func.children);
+    }
+
     int visit(Node node) {
         switch (node.getClass().getSimpleName()) {
+        case "ProgClass":
+            visitProgClass((ProgClass) node);
+            return 0;
         case "Assign":
             visitAssign((Assign) node);
             return 0;
@@ -83,8 +92,7 @@ public class Interpreter {
         case "Num":
             return visitNum((Num) node);
         case "UnaryOperator":
-            visitUnOp((UnaryOperator) node);
-            return 0;
+            return visitUnOp((UnaryOperator) node);
         case "Var":
             return visitVar((Var) node);
         default:
