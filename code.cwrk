@@ -1,0 +1,6 @@
+i = 0;
+a = 10;
+while (i < a) {
+    print(i);
+    i = i + 1;
+};
