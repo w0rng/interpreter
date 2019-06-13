@@ -34,8 +34,11 @@ class Lexer {
 
     // Получение подряд идущих цифр
     private String integer() {
+        Boolean tmp = true;
         String result = "";
-        while (Character.isDigit(currentChar) && currentChar != '\0') {
+        while ((Character.isDigit(currentChar) || (currentChar == '.' && tmp)) && currentChar != '\0') {
+            if (currentChar == '.')
+                tmp = false;
             result += currentChar;
             getNextChar();
         }
@@ -60,7 +63,7 @@ class Lexer {
     Token getNextToken() {
         while (currentChar != '\0') {
             // Пробелы пропускаем
-            if (currentChar == ' ') {
+            if (currentChar == ' ' || currentChar == '\t') {
                 getNextChar();
                 continue;
             } else if (Character.isLetter(currentChar)) {

@@ -11,7 +11,7 @@ public class Num extends Node {
     }
 
     // Метод получения значения
-    public int getValue() {
-        return Integer.parseInt(token.value);
+    public float getValue() {
+        return Float.parseFloat(token.value);
     }
 }

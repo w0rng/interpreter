@@ -10,8 +10,8 @@ public class TokenTypes {
 
     // Список всех токенов
     public static enum Types {
-        EOF, INT, PLUS, LPLUS, MINUS, MUL, LMUL, DIV, MORE, LESS, LPAREN, RPAREN, LBRACE, RBRACE, ID, ASSIGN, SEMI, IF,
-        WHILE, PRINT, SCAN,
+        EOF, INT, PLUS, MINUS, MUL, DIV, MORE, LESS, LPAREN, RPAREN, LBRACE, RBRACE, ID, ASSIGN, SEMI, IF, WHILE, PRINT,
+        SCAN,
     }
 
     // Слова, с которыми ассоциируются токены
@@ -21,8 +21,6 @@ public class TokenTypes {
         Tokens.put("*", new Token(Types.MUL, "*"));
         Tokens.put("/", new Token(Types.DIV, "/"));
 
-        Tokens.put("&", new Token(Types.LMUL, "&"));
-        Tokens.put("|", new Token(Types.LPLUS, "|"));
         Tokens.put(">", new Token(Types.MORE, ">"));
         Tokens.put("<", new Token(Types.LESS, "<"));
 

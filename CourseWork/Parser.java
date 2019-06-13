@@ -156,8 +156,8 @@ class Parser {
     // Умножение, деление и сравнение переменных
     private Node term() {
         Node node = factor();
-        while (currentToken.type == Types.DIV || currentToken.type == Types.MUL || currentToken.type == Types.LMUL
-                || currentToken.type == Types.LESS || currentToken.type == Types.MORE) {
+        while (currentToken.type == Types.DIV || currentToken.type == Types.MUL || currentToken.type == Types.LESS
+                || currentToken.type == Types.MORE) {
             Token token = currentToken;
             want(token.type);
             node = new BinaryOperator(node, token, factor());
@@ -169,8 +169,7 @@ class Parser {
     // Так же совершение логических опреаторов
     private Node expr() {
         Node node = term();
-        while (currentToken.type == Types.PLUS || currentToken.type == Types.MINUS
-                || currentToken.type == Types.LPLUS) {
+        while (currentToken.type == Types.PLUS || currentToken.type == Types.MINUS) {
             Token token = currentToken;
             want(token.type);
             node = new BinaryOperator(node, token, term());
