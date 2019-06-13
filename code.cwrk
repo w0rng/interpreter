@@ -1,6 +1,12 @@
-i = 0;
-a = 10;
-while (i < a) {
-    print(i);
-    i = i + 1;
+sqrt = 0;
+scan(sqrt);
+
+x = 1;
+i = 10;
+
+while (i > 0) {
+    i = i - 1;
+    x = (sqrt / x + x) / 2;
 };
+
+print(x);

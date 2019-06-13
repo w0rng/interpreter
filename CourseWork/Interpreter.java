@@ -12,7 +12,7 @@ public class Interpreter {
     Parser parser; // Объект парсера
     // Буфер для пременных
     // Названию сопоставляется значение
-    private static Map<String, Integer> Scope = new HashMap<String, Integer>();
+    private static Map<String, Float> Scope = new HashMap<String, Float>();
 
     // Конструктор
     public Interpreter(Parser parser) {
@@ -26,7 +26,7 @@ public class Interpreter {
     }
 
     // Интерпретация унарных операторов
-    int visitUnOp(UnaryOperator node) {
+    float visitUnOp(UnaryOperator node) {
         switch (node.token.type) {
         case PLUS:
             return visit(node.right);
@@ -38,18 +38,14 @@ public class Interpreter {
     }
 
     // Интерпретация бинарных операторов
-    int visitBinOp(BinaryOperator node) {
+    float visitBinOp(BinaryOperator node) {
         switch (node.token.type) {
         case PLUS:
             return visit(node.left) + visit(node.right);
-        case LPLUS:
-            return visit(node.left) | visit(node.right);
         case MINUS:
             return visit(node.left) - visit(node.right);
         case MUL:
             return visit(node.left) * visit(node.right);
-        case LMUL:
-            return visit(node.left) & visit(node.right);
         case DIV:
             return visit(node.left) / visit(node.right);
         case MORE:
@@ -63,14 +59,14 @@ public class Interpreter {
     }
 
     // Интерпретация вложеных элементов
-    int visitCompound(Compound node) {
+    float visitCompound(Compound node) {
         for (Node child : node.get())
             visit(child);
         return 0;
     }
 
     // Интерпретация равно
-    int visitAssign(Assign node) {
+    float visitAssign(Assign node) {
         // Получаем название пременной
         String varName = node.left.token.value;
         // Записывем его в букфер и интерпретируем правую часть равно
@@ -79,7 +75,7 @@ public class Interpreter {
     }
 
     // Интерпретация пременных
-    int visitVar(Var node) {
+    float visitVar(Var node) {
         // Получаем название пременной
         String name = node.token.value;
         // Если в буфере нет такого, дропаем ошибку
@@ -90,19 +86,19 @@ public class Interpreter {
     }
 
     // Интерпретация числе
-    int visitNum(Num node) {
+    float visitNum(Num node) {
         return node.getValue();
     }
 
     // Интерпретация условий
-    int visitCondition(Condition cond) {
+    float visitCondition(Condition cond) {
         if (visit(cond.condition) != 0)
             visit(cond.children);
         return 0;
     }
 
     // Интерпретация циклов
-    int visitLoop(Loop loop) {
+    float visitLoop(Loop loop) {
         if (visit(loop.condition) != 0) {
             visit(loop.children);
             visitLoop(loop);
@@ -111,20 +107,20 @@ public class Interpreter {
     }
 
     // Интерпретация метода вывода в консоль
-    int visitPrint(Print node) {
+    float visitPrint(Print node) {
         Print f = (Print) node;
         Var v = (Var) f.param;
-        System.out.println(visitVar(v));
+        System.out.print(visitVar(v));
         return 0;
     }
 
     // Интерпретация методы чтения из сконсоли
-    int visitScan(Scan node) {
+    float visitScan(Scan node) {
         Scan f = (Scan) node;
         Var v = (Var) f.param;
         System.out.print(v.token.value + " = ");
         Scanner in = new Scanner(System.in);
-        int tmp = in.nextInt();
+        float tmp = in.nextInt();
         Scope.put(v.token.value, tmp);
         in.close();
         return 0;
@@ -134,7 +130,7 @@ public class Interpreter {
     // Тип определяется по названию класса
     // Как только тип определн, объект узла передается в метод, который умеет его
     // обрабатывнить
-    int visit(Node node) {
+    float visit(Node node) {
         switch (node.getClass().getSimpleName()) {
         case "Assign":
             return visitAssign((Assign) node);
